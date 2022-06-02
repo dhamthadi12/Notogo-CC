@@ -35,14 +35,57 @@ app.listen(port, () => {
 
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
-    // TODO: register to db
-    res.send();
+    db.query(
+        `SELECT email FROM user_embedding where email = '${email}'`,
+        (err, result, fields) => {
+            // if (err) throw err;
+            if (result.length != 0) {
+                res.send({ message: 'Email already exists' });
+            } else {
+                db.query(
+                    `INSERT INTO user_embedding (name, email, password) VALUES ('${name}', '${email}', '${password}')`,
+                    (err, result, fields) => {
+                        // if (err) throw err;
+                    }
+                )
+                db.query(
+                    `SELECT user_id FROM user_embedding where email = '${email}'`,
+                    (err, result, fields) => {
+                        // if (err) throw err;
+                        res.send({
+                            message: 'Account created',
+                            user_id: result[0]['user_id']
+                        });
+                        return;
+                    }
+                );
+            }
+        }
+    );
 });
+
+
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-    // TODO: login to db
-    res.send();
+    db.query(
+        `SELECT * FROM user_embedding WHERE email = '${email}'`,
+        (err, result, fields) => {
+            if (result.length == 0) {
+                res.send({ message: 'Email does not exist'});
+                return;
+            }
+            const user = result[0];
+            if (password != user['password']) {
+                res.send({ message: 'Wrong password' });
+                return;
+            }
+            res.send({
+                message: 'Logged in!',
+                user_id: user['user_id']
+            })
+        }
+    );
 })
 
 app.get('/profile/:userId', (req, res) => {
@@ -61,7 +104,7 @@ app.get('/profile/:userId', (req, res) => {
 app.get('/recommendation/:userId', (req, res) => {
     const { userId } = req.params;
     res.send();
-}) 
+})
 
 
 // bucket list
