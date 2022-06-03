@@ -32,60 +32,18 @@ app.listen(port, () => {
 
 
 // Account
+const authService = require('./services/auth');
 
 app.post('/register', (req, res) => {
-    const { name, email, password } = req.body;
-    db.query(
-        `SELECT email FROM user_embedding where email = '${email}'`,
-        (err, result, fields) => {
-            // if (err) throw err;
-            if (result.length != 0) {
-                res.send({ message: 'Email already exists' });
-            } else {
-                db.query(
-                    `INSERT INTO user_embedding (name, email, password) VALUES ('${name}', '${email}', '${password}')`,
-                    (err, result, fields) => {
-                        // if (err) throw err;
-                    }
-                )
-                db.query(
-                    `SELECT user_id FROM user_embedding where email = '${email}'`,
-                    (err, result, fields) => {
-                        // if (err) throw err;
-                        res.send({
-                            message: 'Account created',
-                            user_id: result[0]['user_id']
-                        });
-                        return;
-                    }
-                );
-            }
-        }
-    );
+    authService.register(db, req, res);
 });
 
-
-
 app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    db.query(
-        `SELECT * FROM user_embedding WHERE email = '${email}'`,
-        (err, result, fields) => {
-            if (result.length == 0) {
-                res.send({ message: 'Email does not exist'});
-                return;
-            }
-            const user = result[0];
-            if (password != user['password']) {
-                res.send({ message: 'Wrong password' });
-                return;
-            }
-            res.send({
-                message: 'Logged in!',
-                user_id: user['user_id']
-            })
-        }
-    );
+    authService.login(db, req, res);
+})
+
+app.post('/logout', (req, res) => {
+    authService.logout(db, req, res);
 })
 
 app.get('/profile/:userId', (req, res) => {
