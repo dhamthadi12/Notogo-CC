@@ -130,3 +130,6 @@ dist
 .pnp.*
 
 coba.js
+
+keys/*
+!keys/readme.md

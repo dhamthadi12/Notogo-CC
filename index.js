@@ -1,22 +1,13 @@
-// Init db connection
-const mysql = require('mysql');
-const db = mysql.createConnection({
-    host: "34.101.251.5",
-    user: "root",
-    password: "1234",
-    database: "notogo",
-});
-
-db.connect(function (err) {
-    if (err) throw err;
-    console.log("Database connected!");
-});
-
-
 // Init express API
+const cors = require("cors");
 const express = require('express');
 const app = express();
+let corsOptions = {
+    origin: "http://localhost:8081",
+};
 const port = parseInt(process.env.PORT) || 8080;
+app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -29,50 +20,29 @@ app.listen(port, () => {
 });
 
 
-
-
 // Account
-const authService = require('./services/auth');
+const { register, login, logout } = require('./services/auth');
+app.post('/register', register);
+app.post('/login', login);
+app.post('/logout', logout);
 
-app.post('/register', (req, res) => {
-    authService.register(db, req, res);
-});
+const { profileDetails, profilePreferences, uploadProfilePhoto, profileHistory, favorites } = require('./services/profile')
+app.get('/profile', profileDetails)
+app.put('/profile/preferences', profilePreferences)
+app.put('/profile/photo', uploadProfilePhoto)
+app.get('/profile/history', profileHistory)
+app.get('/profile/favorite', favorites)
 
-app.post('/login', (req, res) => {
-    authService.login(db, req, res);
-})
-
-app.post('/logout', (req, res) => {
-    authService.logout(db, req, res);
-})
-
-app.get('/profile/:userId', (req, res) => {
-    const { userId } = req.params;
-    db.query(
-        `SELECT * FROM user_embedding WHERE user_id = ${userId}`,
-        (err, result, fields) => {
-            if (err) throw err;
-            res.send(result[0]);
-        }
-    )
-})
+const { allGoals, getGoal, addGoal, addGoalPhoto, doneGoal, deleteGoal, searchLocation } = require('./services/goals')
+app.get('/goals', allGoals)
+app.get('/goals/:goal_id', getGoal)
+app.post('/goals/add', addGoal)
+app.put('/goals/photo/:goal_id', addGoalPhoto)
+app.post('/goals/done', doneGoal)
+app.delete('/goals/delete', deleteGoal)
+app.get('/location/search', searchLocation)
 
 
-// Recommendation
-app.get('/recommendation/:userId', (req, res) => {
-    const { userId } = req.params;
-    res.send();
-})
-
-
-// bucket list
-app.get('/goal/:goalId', (req, res) => {
-    const { goalId } = req.params;
-    db.query(
-        `SELECT * FROM wish_features WHERE location_id = ${goalId}`,
-        (err, result, fields) => {
-            if (err) throw err;
-            res.send(result[0]);
-        }
-    )
-})
+const { getRecommendations, likeRecommendation } = require('./services/recommendations')
+app.get('/recommendations', getRecommendations)
+app.put('/recommendations/like', likeRecommendation)
