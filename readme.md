@@ -1,11 +1,18 @@
-## First Time
-Install Cloud SDK from [Installing Cloud SDK | Google Cloud](https://cloud.google.com/sdk/docs/install)
-then run one by one
-```
-    gcloud auth login
-    gcloud config set project polished-citron-35140
-```
+# NoToGo
+Backend services for the NoToGo Android App
 
-## Deploying
+## Cloud Computing
+![Cloud Infrastructure](https://storage.googleapis.com/notogo-docs/infrastructure-notogo.drawio.png)
 
-    gcloud app deploy
+Service used :
+
+ - Cloud Service : Google Cloud Platform
+ - API Service : Cloud Run - NodeJS - ExpressJS
+ - ML Service : Cloud Run - Python - Flask - Tensorflow
+ - Database : Cloud SQL - MySQL
+ - Repo : GitHub
+
+## REST API
+![API FlowChart](https://storage.googleapis.com/notogo-docs/flowchart-notogo.png)
+
+We are using NodeJS with ExpressJS Framework with MySQL as the technology stack.
